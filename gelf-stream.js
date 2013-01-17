@@ -13,6 +13,8 @@ function create(host, port, options) {
   }
   if (options == null) options = {}
 
+  if (options.keepAlive == null) options.keepAlive = true
+
   var client = gelfling(host, port, options)
     , mapStream = map(function send(log, cb) {
         if (options.filter && !options.filter(log)) return cb()

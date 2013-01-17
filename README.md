@@ -3,7 +3,9 @@ gelf-stream
 
 [![Build Status](https://secure.travis-ci.org/mhart/gelf-stream.png?branch=master)](http://travis-ci.org/mhart/gelf-stream)
 
-A node.js stream to send JS objects to a Graylog2 server (in GELF format).
+A node.js stream to send JS objects to a
+[Graylog2](http://graylog2.org/) server (in
+[GELF](http://www.graylog2.org/about/gelf) format).
 
 Also provides a stream that can be used directly in
 [Bunyan](https://github.com/trentm/node-bunyan) and provides
@@ -23,9 +25,11 @@ var stream = gelfStream.createBunyan('localhost')
 
 var log = bunyan.createLogger({name: 'foo', streams: [{type: 'raw', stream: stream}]})
 
-log.info('Testing Bunyan')
+log.info('Testing Bunyan') // will be sent to the Graylog2 server on localhost
 
-stream.end()
+log.error(new Error('Oh noes!')) // will extract file/line numbers too
+
+stream.end() // end the stream when the program has finished
 
 // Or you can use it to stream any sort of object/string
 

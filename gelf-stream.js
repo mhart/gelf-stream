@@ -70,7 +70,7 @@ function bunyanToGelf(log) {
       }
 
   if (log.err && log.err.stack &&
-      (errFile = log.err.stack.match(/\n\s+at ([^:]+)\:([0-9]+)/)) != null) {
+      (errFile = log.err.stack.match(/\n\s+at .+ \(([^:]+)\:([0-9]+)/)) != null) {
     if (errFile[1]) gelfMsg.file = errFile[1]
     if (errFile[2]) gelfMsg.line = errFile[2]
   }

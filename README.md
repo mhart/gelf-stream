@@ -21,7 +21,7 @@ var split = require('split')
 
 // gelf-stream comes with Bunyan support
 
-var stream = gelfStream.createBunyan('localhost')
+var stream = gelfStream.forBunyan('localhost')
 
 var log = bunyan.createLogger({name: 'foo', streams: [{type: 'raw', stream: stream}]})
 
@@ -45,7 +45,7 @@ API
 
 ### gelfStream.create([host], [port], [options])
 
-### gelfStream.createBunyan([host], [port], [options])
+### gelfStream.forBunyan([host], [port], [options])
 
 
 Installation

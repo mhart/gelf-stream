@@ -83,7 +83,7 @@ function bunyanToGelf(log) {
   return gelfMsg
 }
 
-function createBunyan(host, port, options) {
+function forBunyan(host, port, options) {
   if (options == null && typeof port === 'object') {
     options = port
     port = null
@@ -100,7 +100,7 @@ function createBunyan(host, port, options) {
 }
 
 gelfStream.create = create
-gelfStream.createBunyan = createBunyan
+gelfStream.forBunyan = forBunyan
 gelfStream.bunyanToGelf = bunyanToGelf
 gelfStream.mapGelfLevel = mapGelfLevel
 gelfStream.flatten = flatten

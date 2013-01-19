@@ -17,8 +17,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "gelfling": "~0.2.0",
-    "map-stream": "~0.0.1"
+    "gelfling": "~0.2.0"
   },
   "devDependencies": {
     "should": "~1.2.1",

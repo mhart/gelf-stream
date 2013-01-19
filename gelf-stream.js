@@ -1,6 +1,6 @@
 var gelfStream = exports
 var gelfling   = require('gelfling')
-var map        = require('map-stream')
+var Stream     = require('stream').Stream
 
 function create(host, port, options) {
   if (options == null && typeof port === 'object') {
@@ -16,14 +16,24 @@ function create(host, port, options) {
   if (options.keepAlive == null) options.keepAlive = true
 
   var client = gelfling(host, port, options)
-    , mapStream = map(function send(log, cb) {
-        if (options.filter && !options.filter(log)) return cb()
-        client.send(options.map ? options.map(log) : log, cb)
-      })
+    , stream = new Stream()
 
-  mapStream.on('end', function() { client.close() })
+  client.errHandler = function(err) {
+    if (err) stream.emit('error', err)
+  }
 
-  return mapStream
+  stream.writable = true
+  stream.write = function(log) {
+    if (!options.filter || options.filter(log))
+      client.send(options.map ? options.map(log) : log, client.errHandler)
+  }
+  stream.end = function(log) {
+    if (arguments.length) stream.write(log)
+    stream.writable = false
+    process.nextTick(function() { client.close() })
+  }
+
+  return stream
 }
 
 // ---------------------------

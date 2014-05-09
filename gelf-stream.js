@@ -15,8 +15,8 @@ function create(host, port, options) {
 
   if (options.keepAlive == null) options.keepAlive = true
 
-  var client = gelfling(host, port, options)
-    , stream = new Stream()
+  var client = gelfling(host, port, options),
+      stream = new Stream()
 
   client.errHandler = function(err) {
     if (err) stream.emit('error', err)
@@ -45,10 +45,10 @@ function mapGelfLevel(bunyanLevel) {
     case 10 /*bunyan.TRACE*/: return gelfling.DEBUG
     case 20 /*bunyan.DEBUG*/: return gelfling.DEBUG
     case 30 /*bunyan.INFO*/:  return gelfling.INFO
-    case 40 /*bunyan.WARN*/:  return gelfling.WARN
+    case 40 /*bunyan.WARN*/:  return gelfling.WARNING
     case 50 /*bunyan.ERROR*/: return gelfling.ERROR
     case 60 /*bunyan.FATAL*/: return gelfling.EMERGENCY
-    default:                  return gelfling.WARN
+    default:                  return gelfling.WARNING
   }
 }
 
@@ -69,10 +69,11 @@ function flatten(obj, into, prefix, sep) {
 }
 
 function bunyanToGelf(log) {
-  var errFile, key
-    , ignoreFields = ['hostname', 'time', 'msg', 'name', 'level', 'v']
-    , flattenedLog = flatten(log)
-    , gelfMsg = {
+  /*jshint camelcase:false */
+  var errFile, key,
+      ignoreFields = ['hostname', 'time', 'msg', 'name', 'level', 'v'],
+      flattenedLog = flatten(log),
+      gelfMsg = {
         host:          log.hostname,
         timestamp:     +new Date(log.time) / 1000,
         short_message: log.msg,

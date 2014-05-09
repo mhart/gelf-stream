@@ -15,9 +15,9 @@ Example
 -------
 
 ```javascript
-var split = require('split')
-  , bunyan = require('bunyan')
-  , gelfStream = require('gelf-stream')
+var split = require('split'),
+    bunyan = require('bunyan'),
+    gelfStream = require('gelf-stream')
 
 // gelf-stream comes with Bunyan support
 

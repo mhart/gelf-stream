@@ -58,7 +58,7 @@ function flatten(obj, into, prefix, sep) {
   if (sep == null) sep = '.'
   var key, prop
   for (key in obj) {
-    if (!obj.hasOwnProperty(key)) continue
+    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue
     prop = obj[key]
     if (typeof prop === 'object' && !(prop instanceof Date) && !(prop instanceof RegExp))
       flatten(prop, into, prefix + key + sep, sep)
@@ -106,7 +106,7 @@ function forBunyan(host, port, options) {
     }
   }
   if (options == null) options = {}
-  
+
   options.map = bunyanToGelf
 
   return create(host, port, options)

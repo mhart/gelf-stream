@@ -5,7 +5,7 @@ gelf-stream
 
 A node.js stream to send JS objects to a
 [Graylog2](http://graylog2.org/) server (in
-[GELF](http://www.graylog2.org/about/gelf) format).
+[GELF](http://graylog2.org/resources/gelf) format).
 
 Also provides a stream that can be used directly in
 [Bunyan](https://github.com/trentm/node-bunyan) and provides

@@ -23,14 +23,35 @@ function create(host, port, options) {
   }
 
   stream.writable = true
-  stream.write = function(log) {
+  stream.write = function(log, encoding, callback) {
+    if (typeof encoding === 'function') {
+      callback = encoding;
+      encoding = null;
+    }
+
     if (!options.filter || options.filter(log))
-      client.send(options.map ? options.map(log) : log, client.errHandler)
+      client.send(options.map ? options.map(log) : log, client.errHandler, callback)
   }
-  stream.end = function(log) {
-    if (arguments.length) stream.write(log)
-    stream.writable = false
-    process.nextTick(function() { client.close() })
+  stream.end = function(log, encoding, callback) {
+    if (typeof log === 'function') {
+      callback = log
+      log = null
+      encoding = null
+    } else if (typeof encoding === 'function') {
+      callback = encoding
+      encoding = null
+    }
+
+    function endStream() {
+      stream.writable = false
+      client.close()
+      if (callback) callback()
+    }
+
+    if (typeof log !== 'undefined' && log !== null)
+      stream.write(log, endStream)
+    else
+      endStream()
   }
 
   return stream

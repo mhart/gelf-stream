@@ -1,8 +1,9 @@
 var gelfStream = exports
 var gelfling   = require('gelfling')
-var Stream     = require('stream').Stream
+var util       = require('util')
+var Writable   = require('stream').Writable
 
-function create(host, port, options) {
+function GelfStream(host, port, options) {
   if (options == null && typeof port === 'object') {
     options = port
     port = null
@@ -15,25 +16,33 @@ function create(host, port, options) {
 
   if (options.keepAlive == null) options.keepAlive = true
 
-  var client = gelfling(host, port, options),
-      stream = new Stream()
+  Writable.call(this, {objectMode: true});
 
-  client.errHandler = function(err) {
-    if (err) stream.emit('error', err)
+  this._options = options
+  this._client = gelfling(host, port, options)
+
+  this.once('finish', this.destroy)
+}
+util.inherits(GelfStream, Writable);
+
+GelfStream.prototype._write = function(chunk, encoding, callback) {
+  if (typeof encoding === 'function') {
+    callback = encoding;
+    encoding = null;
   }
 
-  stream.writable = true
-  stream.write = function(log) {
-    if (!options.filter || options.filter(log))
-      client.send(options.map ? options.map(log) : log, client.errHandler)
-  }
-  stream.end = function(log) {
-    if (arguments.length) stream.write(log)
-    stream.writable = false
-    process.nextTick(function() { client.close() })
-  }
+  if (!this._options.filter || this._options.filter(chunk))
+    this._client.send(this._options.map ? this._options.map(chunk) : chunk, callback)
+}
 
-  return stream
+GelfStream.prototype.destroy = function(callback) {
+  if (callback) this.once('close', cb)
+  this._client.close()
+  process.nextTick(function() { this.emit('close') })
+}
+
+function create(host, port, options) {
+  return new GelfStream(host, port, options)
 }
 
 // ---------------------------
@@ -109,9 +118,10 @@ function forBunyan(host, port, options) {
 
   options.map = bunyanToGelf
 
-  return create(host, port, options)
+  return new GelfStream(host, port, options)
 }
 
+gelfStream.GelfStream = GelfStream
 gelfStream.create = create
 gelfStream.forBunyan = forBunyan
 gelfStream.bunyanToGelf = bunyanToGelf

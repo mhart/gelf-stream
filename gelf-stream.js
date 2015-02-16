@@ -16,14 +16,14 @@ function GelfStream(host, port, options) {
 
   if (options.keepAlive == null) options.keepAlive = true
 
-  Writable.call(this, {objectMode: true});
+  Writable.call(this, {objectMode: true})
 
   this._options = options
   this._client = gelfling(host, port, options)
 
   this.once('finish', this.destroy)
 }
-util.inherits(GelfStream, Writable);
+util.inherits(GelfStream, Writable)
 
 GelfStream.prototype._write = function(chunk, encoding, callback) {
   if (typeof encoding === 'function') {

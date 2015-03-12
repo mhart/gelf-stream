@@ -1,6 +1,6 @@
 {
   "name": "gelf-stream",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A stream to send JS objects to a Graylog2 server (in GELF format)",
   "author": "Michael Hart <michael.hart.au@gmail.com> (http://github.com/mhart)",
   "main": "gelf-stream.js",

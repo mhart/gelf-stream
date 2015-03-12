@@ -31,7 +31,7 @@ GelfStream.prototype._write = function(chunk, encoding, callback) {
 }
 
 GelfStream.prototype.destroy = function(callback) {
-  if (callback) this.once('close', cb)
+  if (callback) this.once('close', callback)
   this._client.close()
   process.nextTick(function() { this.emit('close') })
 }

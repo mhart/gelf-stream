@@ -33,7 +33,7 @@ GelfStream.prototype._write = function(chunk, encoding, callback) {
 GelfStream.prototype.destroy = function(callback) {
   if (callback) this.once('close', callback)
   this._client.close()
-  process.nextTick(function() { this.emit('close') })
+  process.nextTick(function() { this.emit('close') }.bind(this))
 }
 
 function create(host, port, options) {

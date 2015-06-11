@@ -20,8 +20,8 @@
     "gelfling": "~0.2.0"
   },
   "devDependencies": {
-    "should": "~1.2.1",
-    "mocha": "~1.7.4"
+    "mocha": "^2.2.5",
+    "should": "^6.0.3"
   },
   "scripts": {
     "test": "mocha ./test/fast.js -b -t 100s -R list"

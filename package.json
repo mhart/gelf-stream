@@ -1,6 +1,6 @@
 {
   "name": "gelf-stream",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A stream to send JS objects to a Graylog2 server (in GELF format)",
   "author": "Michael Hart <michael.hart.au@gmail.com> (http://github.com/mhart)",
   "main": "gelf-stream.js",
@@ -17,7 +17,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "gelfling": "~0.2.0"
+    "gelfling": "git://github.com/parisholley/gelfling.git#udpFix"
   },
   "devDependencies": {
     "mocha": "^2.2.5",

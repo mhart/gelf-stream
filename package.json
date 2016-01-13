@@ -17,11 +17,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "gelfling": "~0.2.0"
+    "gelfling": "^0.3.0"
   },
   "devDependencies": {
-    "mocha": "^2.2.5",
-    "should": "^6.0.3"
+    "mocha": "^2.3.4",
+    "should": "^8.1.1"
   },
   "scripts": {
     "test": "mocha ./test/fast.js -b -t 100s -R list"

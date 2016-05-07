@@ -26,8 +26,11 @@ function GelfStream(host, port, options) {
 util.inherits(GelfStream, Writable)
 
 GelfStream.prototype._write = function(chunk, encoding, callback) {
-  if (!this._options.filter || this._options.filter(chunk))
+  if (!this._options.filter || this._options.filter(chunk)) {
     this._client.send(this._options.map ? this._options.map(chunk) : chunk, callback)
+  } else {
+    callback()
+  }
 }
 
 GelfStream.prototype.destroy = function(callback) {

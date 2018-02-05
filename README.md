@@ -8,7 +8,7 @@ A node.js stream to send JS objects to a
 [GELF](http://graylog2.org/resources/gelf) format).
 
 Also provides a stream that can be used directly in
-[Bunyan](https://github.com/trentm/node-bunyan) and provides
+[Bunyan](https://github.com/trentm/node-bunyan) or [Bole](https://github.com/rvagg/bole) and provides
 a number of sane mappings.
 
 Example
@@ -47,6 +47,7 @@ API
 
 ### gelfStream.forBunyan([host], [port], [options])
 
+### gelfStream.forBole([host], [port], [options])
 
 Installation
 ------------
@@ -56,4 +57,3 @@ With [npm](http://npmjs.org/) do:
 ```
 npm install gelf-stream
 ```
-

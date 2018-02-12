@@ -108,6 +108,9 @@ function loggerToGelf(logger) {
           full_message:  JSON.stringify(log, null, 2)
         }
 
+    if (logger == 'bole' && log.err)
+      gelfMsg.short_message = log.err.message
+
     if (log.err && log.err.stack &&
         (errFile = log.err.stack.match(/\n\s+at .+ \(([^:]+)\:([0-9]+)/)) != null) {
       if (errFile[1]) gelfMsg.file = errFile[1]

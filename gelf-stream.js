@@ -22,16 +22,22 @@ function GelfStream(host, port, options) {
   this._client = gelfling(host, port, options)
 
   this.once('finish', this.destroy)
-}
-util.inherits(GelfStream, Writable)
 
-GelfStream.prototype._write = function(chunk, encoding, callback) {
-  if (!this._options.filter || this._options.filter(chunk)) {
-    this._client.send(this._options.map ? this._options.map(chunk) : chunk, callback)
+  if (this._options.filter) {
+    if (this._options.map) {
+      GelfStream.prototype._write = writeWithFilterMap
+    } else {
+      GelfStream.prototype._write = writeWithFilterNoMap
+    }
   } else {
-    callback()
+    if (this._options.map) {
+      GelfStream.prototype._write = writeWithMapNoFilter
+    } else {
+      GelfStream.prototype._write = writeWithoutFilterMap
+    }
   }
 }
+util.inherits(GelfStream, Writable)
 
 GelfStream.prototype.destroy = function(callback) {
   if (callback) this.once('close', callback)
@@ -117,6 +123,30 @@ function forBunyan(host, port, options) {
   options.map = bunyanToGelf
 
   return new GelfStream(host, port, options)
+}
+
+function writeWithFilterMap(chunk, encoding, callback) {
+  if (this._options.filter(chunk)) {
+    this._client.send(this._options.map(chunk), callback)
+  } else {
+    callback()
+  }
+}
+
+function writeWithFilterNoMap(chunk, encoding, callback) {
+  if (this._options.filter(chunk)) {
+    this._client.send(chunk, callback)
+  } else {
+    callback()
+  }
+}
+
+function writeWithMapNoFilter(chunk, encoding, callback) {
+  this._client.send(this._options.map(chunk), callback)
+}
+
+function writeWithoutFilterMap(chunk, encoding, callback) {
+  this._client.send(chunk, callback)
 }
 
 gelfStream.GelfStream = GelfStream

@@ -44,6 +44,20 @@ function create(host, port, options) {
 }
 
 // ---------------------------
+// Bole stuff
+// ---------------------------
+
+function mapBoleGelfLevel(boleLevel) {
+  switch (boleLevel) {
+    case 'debug': return gelfling.DEBUG
+    case 'info':  return gelfling.INFO
+    case 'warn':  return gelfling.WARNING
+    case 'error': return gelfling.ERROR
+    default:      return gelfling.EMERGENCY
+  }
+}
+
+// ---------------------------
 // Bunyan stuff
 // ---------------------------
 
@@ -58,6 +72,10 @@ function mapGelfLevel(bunyanLevel) {
     default:                  return gelfling.WARNING
   }
 }
+
+// ---------------------------
+// Common stuff
+// ---------------------------
 
 function flatten(obj, into, prefix, sep) {
   if (into == null) into = {}
@@ -75,53 +93,59 @@ function flatten(obj, into, prefix, sep) {
   return into
 }
 
-function bunyanToGelf(log) {
-  /*jshint camelcase:false */
-  var errFile, key,
-      ignoreFields = ['hostname', 'time', 'msg', 'name', 'level', 'v'],
-      flattenedLog = flatten(log),
-      gelfMsg = {
-        host:          log.hostname,
-        timestamp:     +new Date(log.time) / 1000,
-        short_message: log.msg,
-        facility:      log.name,
-        level:         mapGelfLevel(log.level),
-        full_message:  JSON.stringify(log, null, 2)
-      }
+function loggerToGelf(logger) {
+  return function(log) {
+    /*jshint camelcase:false */
+    var errFile, key,
+        ignoreFields = ['hostname', 'time', 'msg', 'name', 'level', 'v'],
+        flattenedLog = flatten(log),
+        gelfMsg = {
+          host:          log.hostname,
+          timestamp:     +new Date(log.time) / 1000,
+          short_message: logger=='bunyan' ? log.msg : log.message,
+          facility:      log.name,
+          level:         logger=='bunyan' ? mapGelfLevel(log.level) : mapBoleGelfLevel(log.level),
+          full_message:  JSON.stringify(log, null, 2)
+        }
 
-  if (log.err && log.err.stack &&
-      (errFile = log.err.stack.match(/\n\s+at .+ \(([^:]+)\:([0-9]+)/)) != null) {
-    if (errFile[1]) gelfMsg.file = errFile[1]
-    if (errFile[2]) gelfMsg.line = errFile[2]
+    if (logger == 'bole' && log.err)
+      gelfMsg.short_message = log.err.message
+
+    if (log.err && log.err.stack &&
+        (errFile = log.err.stack.match(/\n\s+at .+ \(([^:]+)\:([0-9]+)/)) != null) {
+      if (errFile[1]) gelfMsg.file = errFile[1]
+      if (errFile[2]) gelfMsg.line = errFile[2]
+    }
+
+    for (key in flattenedLog) {
+      if (ignoreFields.indexOf(key) < 0 && gelfMsg[key] == null)
+        gelfMsg[key] = flattenedLog[key]
+    }
+
+    return gelfMsg
   }
-
-  for (key in flattenedLog) {
-    if (ignoreFields.indexOf(key) < 0 && gelfMsg[key] == null)
-      gelfMsg[key] = flattenedLog[key]
-  }
-
-  return gelfMsg
 }
 
-function forBunyan(host, port, options) {
-  if (options == null && typeof port === 'object') {
-    options = port
-    port = null
-    if (options == null && typeof host === 'object') {
-      options = host
-      host = null
+function forLogger(logger) {
+  return function(host, port, options) {
+    if (options == null && typeof port === 'object') {
+      options = port
+      port = null
+      if (options == null && typeof host === 'object') {
+        options = host
+        host = null
+      }
     }
+    if (options == null) options = {}
+
+    options.map = loggerToGelf(logger)
+
+    return new GelfStream(host, port, options)
   }
-  if (options == null) options = {}
-
-  options.map = bunyanToGelf
-
-  return new GelfStream(host, port, options)
 }
 
 gelfStream.GelfStream = GelfStream
 gelfStream.create = create
-gelfStream.forBunyan = forBunyan
-gelfStream.bunyanToGelf = bunyanToGelf
-gelfStream.mapGelfLevel = mapGelfLevel
+gelfStream.forBunyan = forLogger('bunyan')
+gelfStream.forBole = forLogger('bole')
 gelfStream.flatten = flatten

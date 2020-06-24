@@ -79,13 +79,13 @@ function bunyanToGelf(log) {
   /*jshint camelcase:false */
   var errFile, key,
       ignoreFields = ['hostname', 'time', 'msg', 'name', 'level', 'v'],
-      flattenedLog = flatten(log),
+      flattenedLog = gelfStream.flatten(log),
       gelfMsg = {
         host:          log.hostname,
         timestamp:     +new Date(log.time) / 1000,
         short_message: log.msg,
         facility:      log.name,
-        level:         mapGelfLevel(log.level),
+        level:         gelfStream.mapGelfLevel(log.level),
         full_message:  JSON.stringify(log, null, 2)
       }
 
